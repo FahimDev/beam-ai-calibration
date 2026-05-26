@@ -1,0 +1,60 @@
+services:
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: beam_ai_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-beam_ai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-beam_ai_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-beam_ai}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-beam_ai}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: beam_ai_api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-beam_ai}:${POSTGRES_PASSWORD:-beam_ai_dev}@postgres:5432/${POSTGRES_DB:-beam_ai}
+      ENV: development
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app               # live reload in dev
+      - beam_images:/app/data/images
+    command: uvicorn beam_ai.api.main:app --host 0.0.0.0 --port 8000 --reload
+
+  jupyter:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: beam_ai_notebook
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-beam_ai}:${POSTGRES_PASSWORD:-beam_ai_dev}@postgres:5432/${POSTGRES_DB:-beam_ai}
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/app
+      - beam_images:/app/data/images
+    command: jupyter lab --ip=0.0.0.0 --no-browser --allow-root --notebook-dir=/app/notebooks
+
+volumes:
+  postgres_data:
+  beam_images:

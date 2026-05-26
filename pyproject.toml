@@ -1,0 +1,47 @@
+[project]
+name = "beam-ai"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+    # DB
+    "sqlalchemy>=2.0",
+    "alembic>=1.13",
+    "psycopg[binary]>=3.1",
+    "pgvector>=0.3",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    # API
+    "fastapi>=0.111",
+    "uvicorn[standard]>=0.30",
+    # Image + ML
+    "opencv-python-headless>=4.10",
+    "numpy>=1.26",
+    "scipy>=1.13",
+    "scikit-learn>=1.5",
+    "torch>=2.3",
+    "torchvision>=0.18",
+    "Pillow>=10.3",
+    # Notebook
+    "jupyterlab>=4.2",
+    "matplotlib>=3.9",
+    "seaborn>=0.13",
+    # Utilities
+    "python-ulid>=2.2",       # for IDs
+    "python-dotenv>=1.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+    "httpx>=0.27",            # FastAPI test client
+    "factory-boy>=3.3",       # test data factories
+    "ruff>=0.4",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
