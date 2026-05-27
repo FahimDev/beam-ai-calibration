@@ -12,16 +12,34 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-beam_ai}"]
       interval: 5s
       timeout: 5s
       retries: 5
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: beam_ai_pgadmin
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"        # single-user mode, no login screen
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+
   api:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.api
     container_name: beam_ai_api
     restart: unless-stopped
@@ -34,13 +52,13 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - .:/app               # live reload in dev
+      - ..:/app
       - beam_images:/app/data/images
     command: uvicorn beam_ai.api.main:app --host 0.0.0.0 --port 8000 --reload
 
   jupyter:
     build:
-      context: .
+      context: ..
       dockerfile: docker/Dockerfile.api
     container_name: beam_ai_notebook
     depends_on:
@@ -51,10 +69,13 @@ services:
     ports:
       - "8888:8888"
     volumes:
-      - .:/app
+      - ..:/app
       - beam_images:/app/data/images
-    command: jupyter lab --ip=0.0.0.0 --no-browser --allow-root --notebook-dir=/app/notebooks
+    command: >
+      jupyter lab --ip=0.0.0.0 --no-browser
+      --allow-root --notebook-dir=/app/notebooks
 
 volumes:
   postgres_data:
+  pgadmin_data:
   beam_images:

@@ -1,3 +1,24 @@
+# beam-ai
+
+AI-assisted laser beam alignment support tool for semiconductor lithography FSEs.
+Offline R&D phase — no hardware, no production deployment.
+
+## Services & ports
+
+| Port | Service | What it is |
+|------|---------|------------|
+| **8000** | FastAPI (REST API) | Main application API. Docs at `http://localhost:8000/docs` (Swagger UI) and `/redoc`. |
+| **5432** | PostgreSQL 16 + pgvector | Primary database. Connect with any Postgres client (user/pass/db all default to `beam_ai`). |
+| **5050** | pgAdmin 4 | Web-based DB browser — no login screen required. Useful for inspecting tables, running ad-hoc SQL. |
+| **8888** | JupyterLab | Notebooks for synthetic data generation, feature exploration, and ML training runs. |
+
+> Start everything: `docker compose -f docker/docker-compose.yml up -d`
+> DB only: `docker compose -f docker/docker-compose.yml up -d postgres`
+
+---
+
+## Project layout
+
 ```
 beam_ai/
 ├── docker/

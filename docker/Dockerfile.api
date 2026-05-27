@@ -4,7 +4,9 @@ RUN apt-get update && apt-get install -y \
     libpq-dev gcc libgl1 libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
 COPY pyproject.toml uv.lock* ./
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --no-install-project
 COPY . .
-ENV PATH="/app/.venv/bin:$PATH"
+RUN uv sync --frozen --no-dev
+ENV PATH="/opt/venv/bin:$PATH"

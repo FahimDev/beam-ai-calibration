@@ -1,0 +1,16 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Beam AI (local)",
+      "Group": "beam-ai",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "beam_ai",
+      "Username": "beam_ai",
+      "Password": "beam_ai_dev",
+      "SSLMode": "prefer",
+      "PassFile": "",
+      "SavePassword": true
+    }
+  }
+}
