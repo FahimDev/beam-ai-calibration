@@ -17,6 +17,22 @@ Offline R&D phase — no hardware, no production deployment.
 
 ---
 
+## Database migrations
+
+Migrations are managed with Alembic. The DB must be running before any migration command.
+
+```bash
+uv run alembic upgrade head          # apply all pending migrations (run this after first clone or after pulling new migrations)
+uv run alembic current               # show the current revision applied to the DB
+uv run alembic history               # list all revisions
+uv run alembic revision --autogenerate -m "description"  # generate a new migration from model changes
+uv run alembic downgrade -1          # roll back one revision
+```
+
+Migration files live in `alembic/versions/`. Every model change must go through a migration — never edit the DB schema by hand.
+
+---
+
 ## Project layout
 
 ```
