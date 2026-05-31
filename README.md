@@ -88,3 +88,51 @@ beam_ai/
 ├── .env.example
 └── README.md
 ```
+
+```
+Layer A — OpenCV preprocessing + classical features   
+          ├─ COG, size, symmetry, ContM, uniformity
+          ├─ Output: 11 numerical features
+          └─ Feeds into both classical ML and as side info
+
+Layer B — Pretrained encoder + embedding              
+          ├─ DINOv2-small or ResNet50 (pretrained)
+          ├─ Output: 384-d or 2048-d embedding vector
+          └─ Stored in pgvector for Gen 2 retrieval
+
+Layer C — Classifier head                             
+          ├─ Option 1: RandomForest (Gen 1 baseline)
+          ├─ Option 2: Logistic regression on embedding
+          └─ Output: rank S/A/B/C/D/E + confidence
+```
+
+After Heat Map we will be extend our work with the given input types: 
+- Gigaphoton DTL logs
+- AMP/OSC/Twin beam mode
+- BP and BD separation
+- Energy Sigma
+- Dose/HK
+- Wavelength
+- F2 pressure
+- HV logs
+- real FSE adjustment decisions
+- final Twin Evaluation from BI Tool
+
+
+| Term                      | Meaning in This Dataset                      | Related to Our Main Project                |
+| ------------------------- | -------------------------------------------- | ------------------------------------------ |
+| **Beam Image**            | 2D heatmap/image of laser intensity          | Similar to BP/BD beam image concept        |
+| **Pixel Intensity**       | Brightness value of each pixel               | Used to calculate beam shape and center    |
+| **Centroid**              | Center of beam intensity                     | Similar to COG: Center of Gravity          |
+| **Major Axis Beam Width** | Wider dimension of the beam                  | Similar to BP/BD size                      |
+| **Minor Axis Beam Width** | Narrower dimension of the beam               | Similar to BP/BD size                      |
+| **Effective Diameter**    | Overall beam diameter estimate               | Beam size/quality indicator                |
+| **Ellipticity**           | How circular or oval the beam is             | Beam shape distortion indicator            |
+| **Gaussian Fit %**        | How well the beam matches Gaussian shape     | Beam quality measurement                   |
+| **Iris Position**         | Optical aperture/control position            | Hardware/control variable                  |
+| **Z Position**            | Optical stage position                       | Hardware/control variable                  |
+| **Pitch Position**        | Angular alignment setting                    | Similar to mirror adjustment axis          |
+| **Yaw Position**          | Angular alignment setting                    | Similar to mirror adjustment axis          |
+| **Power Measurement**     | Measured beam power                          | Similar to Energy/Power performance metric |
+| **Exposure Time**         | Camera capture setting                       | Calibration/preprocessing concern          |
+| **Pairwise Data**         | Two samples compared with a difference count | Useful for similarity/retrieval learning   |
